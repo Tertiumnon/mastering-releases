@@ -4,11 +4,11 @@ This article documents a practical release workflow using Git branches, CI, and 
 
 ## Branch types
 
-- `master` — production code, deployments are driven by tags on this branch.
+- `main` — production code, deployments are driven by tags on this branch.
 - `develop` — integration branch for ongoing work.
 - `release/*` — short-lived stabilization branches for an upcoming release.
 - `future/*` — branches used to collect large epic work; integrate often.
-- `hotfix/*` — urgent fixes created from `master`.
+- `hotfix/*` — urgent fixes created from `main`.
 
 ## Recommended release workflow (example)
 
@@ -24,14 +24,14 @@ git checkout -b release/1.2.0
 
 3. Run full CI and deploy to staging for QA. Example: GitHub Actions job `release-staging`.
 
-4. After QA sign-off, merge to `master`, tag and push the tag. Use annotated tags:
+4. After QA sign-off, merge to `main`, tag and push the tag. Use annotated tags:
 
 ```pwsh
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git merge --no-ff release/1.2.0 -m "Merge release 1.2.0"
 git tag -a v1.2.0 -m "Release v1.2.0"
-git push origin master --follow-tags
+git push origin main --follow-tags
 ```
 
 5. Merge the release back into `develop` to keep fixes:
@@ -54,15 +54,15 @@ git push origin --delete release/1.2.0
 For production issues:
 
 ```pwsh
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git checkout -b hotfix/1.2.1
 # apply fix, commit
 git commit -am "fix: critical bug"
-git checkout master
+git checkout main
 git merge --no-ff hotfix/1.2.1
 git tag -a v1.2.1 -m "Hotfix v1.2.1"
-git push origin master --follow-tags
+git push origin main --follow-tags
 git checkout develop
 git merge --no-ff hotfix/1.2.1
 git push origin develop
@@ -71,7 +71,7 @@ git push origin develop
 ## CI / Infrastructure mapping
 
 - `release/*` → `staging`/`preprod` environment (full regression tests + manual QA).
-- `master` tags (`v*`) → production deployment pipeline (artifact promotion).
+- `main` tags (`v*`) → production deployment pipeline (artifact promotion).
 - `future/*` → test/feature environments; use feature flags for unfinished features.
 
 Automate artifact storage (Docker image registry, npm packages, etc.) and make production deployments trigger only on release tags.
